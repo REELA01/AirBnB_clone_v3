@@ -44,7 +44,7 @@ class FileStorage:
         """serializes __objects to the JSON file (path: __file_path)"""
         json_objects = {}
         for key in self.__objects:
-            json_objects[key] = self.__objects[key].to_dict()
+            json_objects[key] = self.__objects[key].to_dict(dump="Yes")
         with open(self.__file_path, 'w') as f:
             json.dump(json_objects, f)
 
@@ -55,7 +55,7 @@ class FileStorage:
                 jo = json.load(f)
             for key in jo:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
-        except Exception as ex:
+        except:
             pass
 
     def delete(self, obj=None):
@@ -70,25 +70,24 @@ class FileStorage:
         self.reload()
 
     def get(self, cls, id):
-        """to git object"""
-        res = None
-
-        try:
-            for val in self.__objects.values():
-                if val.id == id:
-                    res = val
-        except BaseException:
-            pass
-        return res
+        """
+        Returns the object based on the class name and its ID, or None if not
+        found
+        """
+        key = "{}.{}".format(cls, id)
+        if key in self.__objects.keys():
+            return self.__objects[key]
+        return None
 
     def count(self, cls=None):
-        """to do count"""
-        ct = 0
-
-        if cls is not None:
-            for ke in self.__objects.keys():
-                if cls in ke:
-                    ct += 1
-        else:
-            ct = len(self.__objects)
-        return ct
+        """
+        Returns the number of objects in storage matching the given class name.
+        If no name is passed, returns the count of all objects in storage.
+        """
+        if cls:
+            counter = 0
+            for obj in self.__objects.values():
+                if obj.__class__.__name__ == cls:
+                    counter += 1
+            return counter
+        return len(self.__objects)
