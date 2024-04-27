@@ -70,26 +70,25 @@ class FileStorage:
         self.reload()
 
     def get(self, cls, id):
-        """the object to get"""
-        re = None
+        """
+        gets specific object
+        :param cls: class
+        :param id: id of instance
+        :return: object or None
+        """
+        all_class = self.all(cls)
 
-        try:
-            for va in self.__objects.values():
-                if va.id == id:
-                    re = va
-        except BaseException:
-            pass
+        for obj in all_class.values():
+            if id == str(obj.id):
+                return obj
 
-        return re
+        return None
 
     def count(self, cls=None):
-        """class that is wanted"""
-        cls_count = 0
+        """
+        count of instances
+        :param cls: class
+        :return: number of instances
+        """
 
-        if cls is not None:
-            for ke in self.__objects.keys():
-                if cls in ke:
-                    cls_count += 1
-        else:
-            cls_count = len(self.__objects)
-        return cls_count
+        return len(self.all(cls))
