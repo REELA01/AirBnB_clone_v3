@@ -1,25 +1,30 @@
 #!/usr/bin/python3
-"""create a route /status on the object app_views that returns a JSON"""
-
-from flask import jsonify
-import models
-from models import storage
-from models.base_model import BaseModel
+"""index"""
 from api.v1.views import app_views
+from flask import jsonify
+from models import storage
+from models.city import City
+from models.state import State
+from models.user import User
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
+
+classes = {"users": "User", "places": "Place", "states": "State",
+           "cities": "City", "amenities": "Amenity",
+           "reviews": "Review"}
 
 
-@app_views.route('/status', strict_slashes=False)
+@app_views.route('/status', methods=['GET'])
 def status():
-    """return json"""
-    return jsonify(status='OK')
+    """git to status page"""
+    return jsonify({'status': 'OK'})
 
 
-@app_views.route('/stats', strict_slashes=False)
-def status02():
-    """return the responese"""
-    cls_name = {'states': State, 'users': User,
-            'amenities': Amenity, 'cities': City,
-            'places': Place, 'reviews': Review}
-    for ke in cls_name:
-        cls_name[ke] = storage.count(cls_name[ke])
-    return jsonify(cls_name)
+@app_views.route('/stats', methods=['GET'])
+def stat():
+    """get number of each objects by type"""
+    count_dic = {}
+    for cls in classes:
+        count_dic[cls] = storage.count(classes[cls])
+    return jsonify(count_dic)
